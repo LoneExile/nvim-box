@@ -10,8 +10,22 @@ RUN apt update && apt install -y git build-essential
 RUN apt update && apt install -y golang perl ruby luarocks tklib bat wget tree fd-find jq fzf 
 RUN apt update && apt install -y xclip tmux zip nnn xsel vim curl ca-certificates coreutils sed
 
+RUN apt install -y zsh \
+  && zsh \
+  && chsh -s /bin/zsh \
+  && echo 'export NVM_DIR="$HOME/.nvm"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && echo 'export PNPM_HOME="$HOME/.local/share/pnpm"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && echo 'export PATH="$PNPM_HOME:$PATH"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && echo 'export PYENV_ROOT="$HOME/.pyenv"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && echo 'export PATH=$PYENV_ROOT/shims:$PATH' | tee -a ~/.bashrc ~/.profile ~/.zshrc
+
 # Install NVM
-RUN export NVM_DIR="~/.nvm" && (git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR" && cd "$NVM_DIR" && git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`) && \. "$NVM_DIR/nvm.sh" \
+RUN export NVM_DIR="$HOME/.nvm" \
+  && git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR" \
+  && cd "$NVM_DIR" \
+  && git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)` \
   && \. "$NVM_DIR/nvm.sh" \
   && nvm install $(nvm ls-remote | grep 'v16.' | tail -1 | awk '{print $1}' | sed 's/^v//') \
   && npm install -g neovim pnpm
@@ -32,7 +46,7 @@ RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
 # Install neovim
 RUN apt-get install -y ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
-RUN git clone https://github.com/neovim/neovim /tmp/neovim \
+RUN git clone --depth 1 https://github.com/neovim/neovim /tmp/neovim \
   && cd /tmp/neovim \
   && make CMAKE_BUILD_TYPE=Release \
   && make install \
@@ -44,7 +58,7 @@ RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygi
   && tar xf lazygit.tar.gz -C /usr/local/bin lazygit \
   && rm lazygit.tar.gz
 
-RUN git clone https://github.com/aristocratos/btop.git \
+RUN git clone --depth 1 https://github.com/aristocratos/btop.git \
   && cd btop \
   && make \
   && make install \
@@ -60,7 +74,7 @@ RUN apt-get update \
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Channel 6.0 -Version latest -InstallDir /usr/share/dotnet \
   && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
-RUN git clone https://github.com/LoneExile/nvim.git $HOME/.config/nvim
-RUN nvim --headless "+Lazy! sync" +qa
+RUN git clone --depth 1 https://github.com/LoneExile/nvim.git $HOME/.config/nvim
+# RUN nvim --headless "+Lazy! sync" +qa
 
 CMD ["tail", "-f", "/dev/null"]
