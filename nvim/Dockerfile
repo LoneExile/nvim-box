@@ -11,7 +11,6 @@ RUN apt update && apt install -y golang perl ruby luarocks tklib bat wget tree f
 RUN apt update && apt install -y xclip tmux zip nnn xsel vim curl ca-certificates coreutils sed
 
 RUN apt install -y zsh \
-  && zsh \
   && chsh -s /bin/zsh \
   && echo 'export NVM_DIR="$HOME/.nvm"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
   && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
@@ -19,7 +18,8 @@ RUN apt install -y zsh \
   && echo 'export PNPM_HOME="$HOME/.local/share/pnpm"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
   && echo 'export PATH="$PNPM_HOME:$PATH"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
   && echo 'export PYENV_ROOT="$HOME/.pyenv"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
-  && echo 'export PATH=$PYENV_ROOT/shims:$PATH' | tee -a ~/.bashrc ~/.profile ~/.zshrc
+  && echo 'export PATH=$PYENV_ROOT/shims:$PATH' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
+  && zsh
 
 # Install NVM
 RUN export NVM_DIR="$HOME/.nvm" \
