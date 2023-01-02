@@ -10,6 +10,7 @@ RUN apt update && apt install -y git build-essential
 RUN apt update && apt install -y golang perl ruby luarocks tklib bat wget tree fd-find jq fzf 
 RUN apt update && apt install -y xclip tmux zip nnn xsel vim curl ca-certificates coreutils sed
 
+# Install zsh
 RUN apt install -y zsh \
   && chsh -s /bin/zsh \
   && echo 'export NVM_DIR="$HOME/.nvm"' | tee -a ~/.bashrc ~/.profile ~/.zshrc \
@@ -53,11 +54,13 @@ RUN git clone --depth 1 https://github.com/neovim/neovim /tmp/neovim \
   && cd / \
   && rm -rf /tmp/neovim
 
+# Install Lazygit
 RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v*([^"]+)".*/\1/') \
   && curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" \
   && tar xf lazygit.tar.gz -C /usr/local/bin lazygit \
   && rm lazygit.tar.gz
 
+# Install btop
 RUN git clone --depth 1 https://github.com/aristocratos/btop.git \
   && cd btop \
   && make \
