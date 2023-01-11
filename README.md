@@ -8,3 +8,4 @@ Neovim container
 - add docker glow font? pgcli tmux rclone? sc-im(Spreadsheet)
 - add `RUN xset r rate 210 40`
 - add volumn to container
+- add tmux

@@ -7,7 +7,7 @@ ENV TZ=Asia/Bangkok
 # Update package manager and install dependencies
 RUN apt-get update && apt-get upgrade -y
 RUN apt update && apt install -y git build-essential 
-RUN apt update && apt install -y golang perl ruby luarocks tklib bat wget tree fd-find jq fzf 
+RUN apt update && apt install -y perl ruby luarocks tklib bat wget tree fd-find jq fzf 
 RUN apt update && apt install -y xclip tmux zip nnn xsel vim curl ca-certificates coreutils sed
 
 # Install zsh
@@ -54,6 +54,21 @@ RUN git clone --depth 1 https://github.com/neovim/neovim /tmp/neovim \
   && cd / \
   && rm -rf /tmp/neovim
 
+# Install .NET
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+  libc6 libgcc1 libgssapi-krb5-2 libssl1.1 libstdc++6 zlib1g \
+  && rm -rf /var/lib/apt/lists/*
+RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Channel 6.0 -Version latest -InstallDir /usr/share/dotnet \
+  && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+
+# Install Go
+RUN git clone --depth 1 https://github.com/udhos/update-golang \
+  && cd update-golang \
+  && ./update-golang.sh \
+  && cd .. \
+  && rm -rf update-golang
+
 # Install Lazygit
 RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"v*([^"]+)".*/\1/') \
   && curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" \
@@ -69,15 +84,9 @@ RUN git clone --depth 1 https://github.com/aristocratos/btop.git \
   && cd .. \
   && rm -rf btop
 
-# Install .NET
-RUN apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-  libc6 libgcc1 libgssapi-krb5-2 libssl1.1 libstdc++6 zlib1g \
-  && rm -rf /var/lib/apt/lists/*
-RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Channel 6.0 -Version latest -InstallDir /usr/share/dotnet \
-  && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 RUN git clone --depth 1 https://github.com/LoneExile/nvim.git $HOME/.config/nvim
 # RUN nvim --headless "+Lazy! sync" +qa
 
+# keep the container running, but it will not do anything else
 CMD ["tail", "-f", "/dev/null"]
